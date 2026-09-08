@@ -8,7 +8,7 @@ const users = {
   'admin@example.com': { password: 'admin123', role: 'admin' }
 };
 
-// Login route
+// Login
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
   const user = users[email];
@@ -19,7 +19,7 @@ router.post('/login', (req, res) => {
   res.json({ token });
 });
 
-// Refresh route
+// Refresh
 router.post('/refresh', (req, res) => {
   const { token } = req.body;
   try {
@@ -31,4 +31,4 @@ router.post('/refresh', (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router;   // ✅ critical line
