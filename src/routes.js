@@ -1,23 +1,15 @@
-const jwt = require('jsonwebtoken');
-const SECRET = 'demo-secret';
+const express = require('express');
+const { authorize } = require('./roles');
+const router = express.Router();
 
-function authorize(requiredRole) {
-  return (req, res, next) => {
-    const header = req.headers['authorization'];
-    if (!header) return res.status(401).json({ error: 'No token' });
+// User-only route
+router.get('/records', authorize('user'), (req, res) => {
+  res.json({ message: `Records for ${req.user.email}` });
+});
 
-    try {
-      const token = header.split(' ')[1];
-      const payload = jwt.verify(token, SECRET);
-      if (requiredRole && payload.role !== requiredRole) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
-      req.user = payload;
-      next();
-    } catch {
-      res.status(401).json({ error: 'Invalid token' });
-    }
-  };
-}
+// Admin-only route
+router.get('/admin/data', authorize('admin'), (req, res) => {
+  res.json({ message: 'Sensitive admin data' });
+});
 
-module.exports = { authorize };
+module.exports = router;

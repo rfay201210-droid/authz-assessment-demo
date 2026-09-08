@@ -1,15 +1,34 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const authRoutes = require('./auth');
-const protectedRoutes = require('./routes');
+const jwt = require('jsonwebtoken');
+const router = express.Router();
 
-const app = express();
-app.use(bodyParser.json());
+const SECRET = 'demo-secret';
+const users = {
+  'user@example.com': { password: 'pass123', role: 'user' },
+  'admin@example.com': { password: 'admin123', role: 'admin' }
+};
 
-// Public routes
-app.use('/auth', authRoutes);
+// Login route
+router.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  const user = users[email];
+  if (!user || user.password !== password) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  const token = jwt.sign({ email, role: user.role }, SECRET, { expiresIn: '15m' });
+  res.json({ token });
+});
 
-// Protected routes
-app.use('/api', protectedRoutes);
+// Refresh route
+router.post('/refresh', (req, res) => {
+  const { token } = req.body;
+  try {
+    const payload = jwt.verify(token, SECRET);
+    const newToken = jwt.sign({ email: payload.email, role: payload.role }, SECRET, { expiresIn: '15m' });
+    res.json({ token: newToken });
+  } catch {
+    res.status(401).json({ error: 'Invalid or expired token' });
+  }
+});
 
-app.listen(3000, () => console.log('Demo running on http://localhost:3000'));
+module.exports = router;

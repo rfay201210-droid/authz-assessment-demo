@@ -1,6 +1,3 @@
-const jwt = require('jsonwebtoken');
-const SECRET = 'demo-secret';
-
 function authorize(requiredRole) {
   return (req, res, next) => {
     const header = req.headers['authorization'];
@@ -8,7 +5,7 @@ function authorize(requiredRole) {
 
     try {
       const token = header.split(' ')[1];
-      const payload = jwt.verify(token, SECRET);
+      const payload = jwt.verify(token, 'demo-secret');
       if (requiredRole && payload.role !== requiredRole) {
         return res.status(403).json({ error: 'Forbidden' });
       }

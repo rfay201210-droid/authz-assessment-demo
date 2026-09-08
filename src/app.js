@@ -13,3 +13,4 @@ app.use('/auth', authRoutes);
 app.use('/api', protectedRoutes);
 
 app.listen(3000, () => console.log('Demo running on http://localhost:3000'));
+module.exports = router;
